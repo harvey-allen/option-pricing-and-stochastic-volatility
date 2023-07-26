@@ -37,5 +37,3 @@ def heston_model_monte_carlo_simulation(s0, v0, rho, kappa, theta, sigma, t, n, 
         )
 
     return S, V
-
-
