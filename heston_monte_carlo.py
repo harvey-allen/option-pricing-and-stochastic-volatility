@@ -1,7 +1,9 @@
 import numpy as np
 
 
-def heston_model_monte_carlo_simulation(s0, v0, rho, kappa, theta, sigma, t, n, m, r=0.02):
+def heston_model_monte_carlo_simulation(
+    s0, v0, rho, kappa, theta, sigma, t, n, m, r=0.02
+):
     """
     Inputs:
      - S0, v0: Initial parameters for asset and variance.
@@ -14,8 +16,8 @@ def heston_model_monte_carlo_simulation(s0, v0, rho, kappa, theta, sigma, t, n, 
      - M: Number of scenarios / simulations.
      - R: Risk Free Rate
     Outputs:
-     - Asset prices over time (array).
-     - Variance over time (array).
+     - S: Asset prices over time (array).
+     - V: Variance over time (array).
     """
 
     dt = t / n
