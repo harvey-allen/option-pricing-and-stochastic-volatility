@@ -2,11 +2,11 @@ import numpy as np
 
 
 def heston_model_monte_carlo_simulation(
-    s0, v0, rho, kappa, theta, sigma, t, n, m, r=0.02
+    s0, v0, rho, kappa, theta, sigma, t, n, m, r=0.05
 ):
     """
     Inputs:
-     - S0, v0: Initial parameters for asset and variance.
+     - s0, v0: Initial parameters for asset and variance.
      - rho: Correlation between asset returns and variance.
      - kappa: Rate of mean reversion in variance process.
      - theta: Long-term mean of variance process.
