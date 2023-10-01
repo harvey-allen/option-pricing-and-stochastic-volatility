@@ -1,4 +1,4 @@
+matplotlib==3.8.0
 numpy==1.25.0
 pandas==2.0.3
-yfinance==0.2.22
-Scikit-learn==1.1
+scikit-learn==1.1
