@@ -1,0 +1,18 @@
+[build-system]
+requires = ["scikit-build-core>=0.10", "pybind11>=2.13", "setuptools>=69"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "heston-pricer"
+version = "0.1.0"
+description = "European option pricing and Greeks for Heston-style models with a Python API and C++ core."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.25", "scikit-learn>=1.1"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[tool.scikit-build]
+cmake.version = ">=3.21"
+wheel.packages = ["src/heston_pricer"]
