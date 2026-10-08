@@ -87,6 +87,18 @@ def _residual_target(option: EuropeanOption, params: HestonParameters) -> float:
     return exact_price - baseline
 
 
+def _residual_targets(cases: list[tuple[EuropeanOption, HestonParameters]]) -> np.ndarray:
+    if core is None:
+        raise NotImplementedError("Native Heston pricing core has not been built yet.")
+
+    exact_prices = np.asarray(core.price_european_options(cases), dtype=float)
+    baselines = np.asarray([
+        _black_scholes_price(option, np.sqrt(max(params.v0, 1e-8)))
+        for option, params in cases
+    ], dtype=float)
+    return exact_prices - baselines
+
+
 class HestonNeuralNetworkPricer:
     def __init__(self, config: NeuralPricerConfig | None = None) -> None:
         self.config = config or NeuralPricerConfig()
@@ -103,7 +115,7 @@ class HestonNeuralNetworkPricer:
             examples = list(training_examples)
             if not examples:
                 raise ValueError("training_examples must not be empty.")
-            targets = np.array([_residual_target(option, params) for option, params in examples], dtype=float)
+            targets = _residual_targets(examples)
             training_examples = examples
 
         features = np.vstack([_option_to_features(option, params) for option, params in training_examples])
@@ -236,6 +248,6 @@ class HestonNeuralNetworkPricer:
                 rho=float(rng.uniform(-0.95, 0.0)),
             )
             examples.append((option, params))
-            targets.append(_residual_target(option, params))
+        targets_array = _residual_targets(examples)
 
-        return examples, np.asarray(targets, dtype=float)
+        return examples, targets_array

@@ -6,6 +6,7 @@
 #include <functional>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 namespace py = pybind11;
 
@@ -281,6 +282,15 @@ GreekResultData compute_greeks(const EuropeanOptionData &option, const HestonPar
     return GreekResultData{base_price, delta, gamma, vega, theta, rho};
 }
 
+std::pair<EuropeanOptionData, HestonParametersData> extract_case(const py::handle &object) {
+    py::sequence case_item = py::reinterpret_borrow<py::sequence>(object);
+    if (py::len(case_item) != 2) {
+        throw py::value_error("Each batch item must be a pair of (option, parameters).");
+    }
+
+    return {extract_option(case_item[0]), extract_parameters(case_item[1])};
+}
+
 }  // namespace
 
 PYBIND11_MODULE(core, m) {
@@ -314,6 +324,57 @@ PYBIND11_MODULE(core, m) {
         result["theta"] = greeks.theta;
         result["rho"] = greeks.rho;
         return result;
+    });
+
+    m.def("price_european_options", [](py::object cases) {
+        std::vector<std::pair<EuropeanOptionData, HestonParametersData>> batch;
+        for (py::handle item : py::reinterpret_borrow<py::iterable>(cases)) {
+            batch.push_back(extract_case(item));
+        }
+
+        std::vector<double> prices;
+        prices.reserve(batch.size());
+        {
+            py::gil_scoped_release release;
+            for (const auto &[option_data, parameter_data] : batch) {
+                prices.push_back(price_european_option_impl(option_data, parameter_data));
+            }
+        }
+
+        py::list results;
+        for (double price : prices) {
+            results.append(price);
+        }
+        return results;
+    });
+
+    m.def("greeks_european_options", [](py::object cases) {
+        std::vector<std::pair<EuropeanOptionData, HestonParametersData>> batch;
+        for (py::handle item : py::reinterpret_borrow<py::iterable>(cases)) {
+            batch.push_back(extract_case(item));
+        }
+
+        std::vector<GreekResultData> results_payload;
+        results_payload.reserve(batch.size());
+        {
+            py::gil_scoped_release release;
+            for (const auto &[option_data, parameter_data] : batch) {
+                results_payload.push_back(compute_greeks(option_data, parameter_data));
+            }
+        }
+
+        py::list results;
+        for (const auto &greeks : results_payload) {
+            py::dict result;
+            result["price"] = greeks.price;
+            result["delta"] = greeks.delta;
+            result["gamma"] = greeks.gamma;
+            result["vega"] = greeks.vega;
+            result["theta"] = greeks.theta;
+            result["rho"] = greeks.rho;
+            results.append(result);
+        }
+        return results;
     });
 
     m.def("backend_name", []() { return "cpp_heston_analytic"; });

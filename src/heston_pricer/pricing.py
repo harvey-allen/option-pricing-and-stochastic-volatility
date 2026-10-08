@@ -16,6 +16,11 @@ class HestonPricer:
             raise NotImplementedError("Native Heston pricing core has not been built yet.")
         return core.price_european_option(option, params)
 
+    def price_many(self, cases: list[tuple[EuropeanOption, HestonParameters]]) -> list[float]:
+        if core is None:
+            raise NotImplementedError("Native Heston pricing core has not been built yet.")
+        return list(core.price_european_options(cases))
+
     def greeks(self, option: EuropeanOption, params: HestonParameters) -> GreekResults:
         if core is None:
             raise NotImplementedError("Native Heston pricing core has not been built yet.")
@@ -27,3 +32,9 @@ class HestonPricer:
         if isinstance(greeks, (tuple, list)) and len(greeks) == 6:
             return GreekResults(*greeks)
         raise TypeError("Unexpected Greeks payload returned by native Heston core.")
+
+    def greeks_many(self, cases: list[tuple[EuropeanOption, HestonParameters]]) -> list[GreekResults]:
+        if core is None:
+            raise NotImplementedError("Native Heston pricing core has not been built yet.")
+        payload = core.greeks_european_options(cases)
+        return [GreekResults(**item) if isinstance(item, dict) else GreekResults(*item) for item in payload]
