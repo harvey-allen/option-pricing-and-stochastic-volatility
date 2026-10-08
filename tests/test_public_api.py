@@ -1,5 +1,5 @@
 from heston_pricer import EuropeanOption, HestonParameters, HestonPricer
-from heston_pricer import _core
+from heston_pricer import core
 
 
 def test_public_types_construct():
@@ -11,7 +11,7 @@ def test_public_types_construct():
 
 
 def test_native_backend_is_available():
-    assert _core.backend_name() == "cpp_heston_analytic"
+    assert core.backend_name() == "cpp_heston_analytic"
 
 
 def test_pricer_prices_european_option():

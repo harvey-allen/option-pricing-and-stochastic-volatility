@@ -11,7 +11,10 @@ from sklearn.compose import TransformedTargetRegressor
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
-from . import _core
+try:
+    from . import core
+except ImportError:  # pragma: no cover - native extension not built yet
+    core = None
 from .models import EuropeanOption, GreekResults, HestonParameters
 
 
@@ -77,7 +80,9 @@ def _black_scholes_price(option: EuropeanOption, volatility: float) -> float:
 
 
 def _residual_target(option: EuropeanOption, params: HestonParameters) -> float:
-    exact_price = _core.price_european_option(option, params)
+    if core is None:
+        raise NotImplementedError("Native Heston pricing core has not been built yet.")
+    exact_price = core.price_european_option(option, params)
     baseline = _black_scholes_price(option, np.sqrt(max(params.v0, 1e-8)))
     return exact_price - baseline
 

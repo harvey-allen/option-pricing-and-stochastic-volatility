@@ -5,21 +5,21 @@ from collections.abc import Mapping
 from .models import EuropeanOption, GreekResults, HestonParameters
 
 try:
-    from . import _core
+    from . import core
 except ImportError:  # pragma: no cover - native extension not built yet
-    _core = None
+    core = None
 
 
 class HestonPricer:
     def price(self, option: EuropeanOption, params: HestonParameters) -> float:
-        if _core is None:
+        if core is None:
             raise NotImplementedError("Native Heston pricing core has not been built yet.")
-        return _core.price_european_option(option, params)
+        return core.price_european_option(option, params)
 
     def greeks(self, option: EuropeanOption, params: HestonParameters) -> GreekResults:
-        if _core is None:
+        if core is None:
             raise NotImplementedError("Native Heston pricing core has not been built yet.")
-        greeks = _core.greeks_european_option(option, params)
+        greeks = core.greeks_european_option(option, params)
         if isinstance(greeks, GreekResults):
             return greeks
         if isinstance(greeks, Mapping):

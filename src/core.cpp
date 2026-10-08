@@ -283,7 +283,7 @@ GreekResultData compute_greeks(const EuropeanOptionData &option, const HestonPar
 
 }  // namespace
 
-PYBIND11_MODULE(_core, m) {
+PYBIND11_MODULE(core, m) {
     m.doc() = "Native Heston pricing core for European options.";
 
     m.def("price_european_option", [](py::object option, py::object parameters) {

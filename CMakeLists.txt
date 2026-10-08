@@ -7,11 +7,11 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(pybind11 CONFIG REQUIRED)
 
-pybind11_add_module(_core cpp/heston_pricer.cpp)
+pybind11_add_module(core src/core.cpp)
 
-target_compile_options(_core PRIVATE
+target_compile_options(core PRIVATE
     $<$<CXX_COMPILER_ID:MSVC>:/W4>
     $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -Wextra -Wpedantic>
 )
 
-install(TARGETS _core DESTINATION heston_pricer)
+install(TARGETS core DESTINATION heston_pricer)
